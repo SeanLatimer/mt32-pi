@@ -184,7 +184,8 @@ bool CConfig::ParseOption(const char* pString, CIPAddress* pOut)
 	char Buffer[16];
 	u8 IPAddress[4];
 
-	strncpy(Buffer, pString, sizeof(Buffer));
+	strncpy(Buffer, pString, sizeof(Buffer-1));
+	Buffer[sizeof(Buffer)-1] = '\0';
 	char* pToken = strtok(Buffer, ".");
 
 	for (uint8_t i = 0; i < 4; ++i)

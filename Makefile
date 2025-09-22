@@ -44,9 +44,6 @@ $(CIRCLE_STDLIB_CONFIG) $(CIRCLE_CONFIG)&:
 	$(CIRCLESTDLIBHOME)/configure --raspberrypi=$(RASPBERRYPI) --prefix=$(PREFIX)
 
 # Apply patches
-	@${APPLY_PATCH} $(CIRCLEHOME) patches/circle-45-minimal-usb-drivers.patch
-	@${APPLY_PATCH} $(CIRCLEHOME) patches/circle-45-cp210x-remove-partnum-check.patch
-	@${APPLY_PATCH} $(CIRCLEHOME) patches/circle-45-gzip-kernel.patch
 
 ifeq ($(strip $(GC_SECTIONS)),1)
 # Enable function/data sections for circle-stdlib
@@ -64,6 +61,16 @@ endif
 
 # Enable PWM audio output on GPIO 12/13 for the Pi Zero 2 W
 	@echo "DEFINE += -DUSE_PWM_AUDIO_ON_ZERO" >> $(CIRCLE_CONFIG)
+
+# Disable unnecessary devices
+	@echo "DEFINE += -DEXCLUDE_USB_STORAGE" >> $(CIRCLE_CONFIG)
+	@echo "DEFINE += -DEXCLUDE_USB_KEYB" >> $(CIRCLE_CONFIG)
+	@echo "DEFINE += -DEXCLUDE_USB_MOUSE" >> $(CIRCLE_CONFIG)
+	@echo "DEFINE += -DEXCLUDE_USB_GAMEPAD" >> $(CIRCLE_CONFIG)
+	@echo "DEFINE += -DEXCLUDE_USB_PRINTER" >> $(CIRCLE_CONFIG)
+	@echo "DEFINE += -DEXCLUDE_USB_NET" >> $(CIRCLE_CONFIG)
+	@echo "DEFINE += -DEXCLUDE_USB_BLUETOOTH" >> $(CIRCLE_CONFIG)
+	@echo "DEFINE += -DEXCLUDE_USB_TOUCHSCREEN" >> $(CIRCLE_CONFIG)
 
 #
 # Build circle-stdlib
@@ -101,36 +108,40 @@ fluidsynth: $(FLUIDSYNTHBUILDDIR)/.done
 $(FLUIDSYNTHBUILDDIR)/.done: $(CIRCLESTDLIBHOME)/.done
 	@${APPLY_PATCH} $(FLUIDSYNTHHOME) patches/fluidsynth-2.4.8-circle.patch
 
-	@CFLAGS="$(CFLAGS_EXTERNAL)" \
-	cmake -B $(FLUIDSYNTHBUILDDIR) \
-		 $(CMAKE_TOOLCHAIN_FLAGS) \
-		 -DCMAKE_C_FLAGS_RELEASE="-Ofast -fopenmp-simd" \
-		 -DCMAKE_BUILD_TYPE=Release \
-		 -DBUILD_SHARED_LIBS=OFF \
-		 -Denable-aufile=OFF \
-		 -Denable-dbus=OFF \
-		 -Denable-dsound=OFF \
-		 -Denable-floats=ON \
-		 -Denable-ipv6=OFF \
-		 -Denable-jack=OFF \
-		 -Denable-ladspa=OFF \
-		 -Denable-libinstpatch=OFF \
-		 -Denable-libsndfile=OFF \
-		 -Denable-midishare=OFF \
-		 -Denable-network=OFF \
-		 -Denable-oboe=OFF \
-		 -Denable-openmp=OFF \
-		 -Denable-opensles=OFF \
-		 -Denable-oss=OFF \
-		 -Denable-pipewire=OFF \
-		 -Denable-pulseaudio=OFF \
-		 -Denable-readline=OFF \
-		 -Denable-sdl2=OFF \
-		 -Denable-threads=OFF \
-		 -Denable-waveout=OFF \
-		 -Denable-winmidi=OFF \
-		 $(FLUIDSYNTHHOME) \
-		 >/dev/null
+	@cmake -S $(FLUIDSYNTHHOME) -B $(FLUIDSYNTHBUILDDIR) \
+		$(CMAKE_TOOLCHAIN_FLAGS) \
+		-DCMAKE_TRY_COMPILE_TARGET_TYPE=STATIC_LIBRARY \
+		-DCMAKE_BUILD_TYPE=Release \
+		-DCMAKE_C_FLAGS="$(CFLAGS_EXTERNAL)" \
+		-DCMAKE_CXX_FLAGS="$(CFLAGS_EXTERNAL)" \
+		-DCMAKE_ASM_FLAGS="$(CPU_FLAGS)" \
+		-DCMAKE_EXE_LINKER_FLAGS="$(CPU_FLAGS)" \
+		-DCMAKE_C_FLAGS_RELEASE="-Ofast -fopenmp-simd" \
+		-DCMAKE_CXX_FLAGS_RELEASE="-Ofast -fopenmp-simd" \
+		-DBUILD_SHARED_LIBS=OFF \
+		-Denable-aufile=OFF \
+		-Denable-dbus=OFF \
+		-Denable-dsound=OFF \
+		-Denable-floats=ON \
+		-Denable-ipv6=OFF \
+		-Denable-jack=OFF \
+		-Denable-ladspa=OFF \
+		-Denable-libinstpatch=OFF \
+		-Denable-libsndfile=OFF \
+		-Denable-midishare=OFF \
+		-Denable-network=OFF \
+		-Denable-oboe=OFF \
+		-Denable-openmp=OFF \
+		-Denable-opensles=OFF \
+		-Denable-oss=OFF \
+		-Denable-pipewire=OFF \
+		-Denable-pulseaudio=OFF \
+		-Denable-readline=OFF \
+		-Denable-sdl2=OFF \
+		-Denable-threads=OFF \
+		-Denable-waveout=OFF \
+		-Denable-winmidi=OFF \
+		>/dev/null
 	@cmake --build $(FLUIDSYNTHBUILDDIR) --target libfluidsynth
 	@touch $@
 
@@ -158,9 +169,6 @@ clean:
 #
 mrproper: clean
 # Reverse patches
-	@${REVERSE_PATCH} $(CIRCLEHOME) patches/circle-45-gzip-kernel.patch
-	@${REVERSE_PATCH} $(CIRCLEHOME) patches/circle-45-cp210x-remove-partnum-check.patch
-	@${REVERSE_PATCH} $(CIRCLEHOME) patches/circle-45-minimal-usb-drivers.patch
 	@${REVERSE_PATCH} $(FLUIDSYNTHHOME) patches/fluidsynth-2.4.8-circle.patch
 
 # Clean circle-stdlib

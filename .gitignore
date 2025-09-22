@@ -6,6 +6,9 @@ sdcard/*
 !sdcard/*.cfg
 !sdcard/*.txt
 
+# Soundfonts
+*.sf2
+
 # Kernel files
 *.elf
 *.hex

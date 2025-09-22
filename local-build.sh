@@ -113,6 +113,7 @@ done
 msg "Preparing sdcard/"
 rm -rf "$SDCARD_DIR"
 mkdir -p "$SDCARD_DIR" "$SDCARD_DIR/firmware" "$SDCARD_DIR/docs" "$SDCARD_DIR/soundfonts"
+cp -af sdcard/. "$SDCARD_DIR"/
 
 [[ -d "$BOOT_HOME" ]] || die "Boot path not found: $BOOT_HOME"
 [[ -d "$WLAN_HOME/firmware" ]] || die "WLAN firmware path not found: $WLAN_HOME/firmware"
