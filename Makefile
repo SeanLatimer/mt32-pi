@@ -4,6 +4,8 @@
 
 include Config.mk
 
+BOARD_STAMP := .build/board.$(BOARD)
+
 .DEFAULT_GOAL=all
 .PHONY: submodules circle-stdlib mt32emu fluidsynth all clean veryclean
 
@@ -135,8 +137,15 @@ $(FLUIDSYNTHBUILDDIR)/.done: $(CIRCLESTDLIBHOME)/.done
 #
 # Build kernel itself
 #
-all: circle-stdlib mt32emu fluidsynth
+all: $(BOARD_STAMP) circle-stdlib mt32emu fluidsynth
 	@$(MAKE) -f Kernel.mk $(KERNEL).img $(KERNEL).hex
+
+$(BOARD_STAMP):
+	@echo ">> Board changed (or first build): $(BOARD) — running mrproper"
+	@rm -f .build/board.*             # drop old stamp(s)
+	@mkdir -p .build
+	@$(MAKE) mrproper                 # the target you found (reverses patches, cleans, etc.)
+	@touch $@
 
 #
 # Clean kernel only

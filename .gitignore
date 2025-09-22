@@ -1,4 +1,6 @@
 # Build directories
+.build
+out
 build-*
 sdcard/*
 !sdcard/*.cfg
