@@ -3,6 +3,9 @@
 out
 build-*
 sdcard/*
+!sdcard/firmware/
+sdcard/firmware/*
+!sdcard/firmware/LICENCE.broadcom_bcm43xx
 !sdcard/*.cfg
 !sdcard/*.txt
 

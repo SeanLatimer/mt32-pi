@@ -179,8 +179,7 @@ jobs:
       run: |
         mkdir -p sdcard/firmware
         make -C ${{ env.wlan-home }}/firmware
-        cp  ${{ env.wlan-home }}/firmware/LICENCE.broadcom_bcm43xx \
-            ${{ env.wlan-home }}/firmware/brcmfmac43430-sdio.bin \
+        cp  ${{ env.wlan-home }}/firmware/brcmfmac43430-sdio.bin \
             ${{ env.wlan-home }}/firmware/brcmfmac43430-sdio.txt \
             ${{ env.wlan-home }}/firmware/brcmfmac43436-sdio.bin \
             ${{ env.wlan-home }}/firmware/brcmfmac43436-sdio.txt \
