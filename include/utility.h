@@ -23,6 +23,8 @@
 #ifndef _utility_h
 #define _utility_h
 
+#include <utility>
+
 #include <circle/string.h>
 #include <circle/util.h>
 
