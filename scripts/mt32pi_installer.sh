@@ -37,8 +37,8 @@
 
 set -o pipefail
 
-SCRIPT_VERSION=0.2.0
-GITHUB_API_URL="https://api.github.com/repos/dwhinham/mt32-pi/releases/latest"
+SCRIPT_VERSION=0.2.1
+GITHUB_API_URL="https://api.github.com/repos/seanlatimer/mt32-pi/releases/latest"
 MISTER_WPA_SUPPLICANT_CFG_PATH="/media/fat/linux/wpa_supplicant.conf"
 
 DIALOG=(dialog --no-collapse --colors --backtitle "mt32-pi Installer v$SCRIPT_VERSION")

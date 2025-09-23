@@ -3,16 +3,17 @@ name: mt32-pi CI
 on: [push, pull_request]
 
 env:
-  toolchain-version: 11.3.rel1
+  toolchain-version: 13.2.Rel1
   python-version: 3.11
+  generaluser-gs-version: 1UJ1mrY2l_C_YbKeyywNUymBz7OTVzQLU
 
 jobs:
   lint:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v5
 
-      - uses: actions/setup-python@v4.5.0
+      - uses: actions/setup-python@v6
         with:
           python-version: ${{ env.python-version }}
 
@@ -41,7 +42,7 @@ jobs:
       matrix:
         board: [pi2, pi3-64, pi4-64]
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v5
 
     - name: Fetch submodules
       run: make submodules
@@ -53,7 +54,7 @@ jobs:
 
     - name: Cache ARM toolchains
       id: cache-toolchains
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       with:
         path: |
           ~/arm-gnu-toolchain-${{ env.toolchain-version }}-x86_64-arm-none-eabi
@@ -78,11 +79,17 @@ jobs:
           echo "$HOME/ccache_bin:$HOME/arm-gnu-toolchain-${{ env.toolchain-version }}-x86_64-${triplet}/bin" >> $GITHUB_PATH
         done
 
+    - name: Install GLib deps
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y --no-install-recommends \
+          pkg-config libglib2.0-dev libglib2.0-dev-bin texinfo
+
     - name: Build
       run: make -j BOARD=${{ matrix.board }}
 
     - name: Upload built kernel
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: kernels
         path: kernel*.img
@@ -91,7 +98,7 @@ jobs:
       run: make clean && make -j BOARD=${{ matrix.board }} HDMI_CONSOLE=1
 
     - name: Upload built kernel
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: kernels-hdmi
         path: kernel*.img
@@ -111,7 +118,7 @@ jobs:
 
     - name: Cache boot files
       id: cache-boot-files
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       with:
         path: |
           sdcard/armstub8-rpi4.bin
@@ -129,14 +136,14 @@ jobs:
 
     - name: Cache WLAN firmware
       id: cache-wlan-firmware
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       with:
         path: sdcard/firmware
         key: cache-wlan-firmware-${{ hashFiles(join(env.wlan-home, '/firmware/Makefile')) }}
 
     - name: Cache ARM toolchains
       if: steps.cache-boot-files.outputs.cache-hit != 'true'
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       with:
         path: |
           ~/arm-gnu-toolchain-${{ env.toolchain-version }}-x86_64-arm-none-eabi
@@ -188,20 +195,20 @@ jobs:
 
     - name: Cache GeneralUser GS SoundFont
       id: cache-generaluser-gs
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       with:
-        path: GeneralUser GS v1.511
-        key: cache-generaluser-gs-1.511
+        path: GeneralUser GS
+        key: cache-generaluser-gs-${{ env.generaluser-gs-version }}
 
     - name: Download GeneralUser GS SoundFont if not retrieved from cache
       if: steps.cache-generaluser-gs.outputs.cache-hit != 'true'
       run: |
         sudo pip install gdown
-        gdown -q https://drive.google.com/uc?id=1ypgJwuHqqXx-jeCXLRFqgBAEemJZnDrj
-        unzip "GeneralUser GS v1.511.zip"
+        gdown ${{ env.generaluser-gs-version }} -O "GeneralUser GS.zip"
+        unzip "GeneralUser GS.zip"
 
     - name: Retrieve built kernels
-      uses: actions/download-artifact@v3
+      uses: actions/download-artifact@v4
       with:
         name: kernels
         path: sdcard
@@ -209,14 +216,14 @@ jobs:
     - name: Add extra files to SD card directory
       run: |
         mkdir sdcard/docs
-        cp "GeneralUser GS v1.511/GeneralUser GS v1.511.sf2" sdcard/soundfonts
-        cp "GeneralUser GS v1.511/CHANGELOG.md" sdcard/docs/CHANGELOG.GeneralUserGS
-        cp "GeneralUser GS v1.511/LICENSE.txt" sdcard/docs/LICENSE.GeneralUserGS
+        cp "GeneralUser GS/GeneralUser GS.sf2" sdcard/soundfonts
+        cp "GeneralUser GS/documentation/CHANGELOG.md" sdcard/docs/CHANGELOG.GeneralUserGS
+        cp "GeneralUser GS/documentation/LICENSE.txt" sdcard/docs/LICENSE.GeneralUserGS
         cp LICENSE sdcard/docs
         cp README.md sdcard/docs
 
     - name: Upload SD card archive
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: sdcard
         path: sdcard
@@ -243,9 +250,9 @@ jobs:
         args: |
             mt32-pi-*.zip
 
-    - name: Notify Discord servers of release
-      if: startsWith(github.ref, 'refs/tags/')
-      run: |
-        sudo pip3 install keepachangelog discord-webhook
-        .github/scripts/discord_notify.py ${{ secrets.MISTER_DISCORD_WEBHOOK }} ${{ steps.get_version.outputs.version }}
-        .github/scripts/discord_notify.py ${{ secrets.FPGAMING_DISCORD_WEBHOOK }} ${{ steps.get_version.outputs.version }}
+    # - name: Notify Discord servers of release
+      # if: startsWith(github.ref, 'refs/tags/')
+      # run: |
+        # sudo pip3 install keepachangelog discord-webhook
+        # .github/scripts/discord_notify.py ${{ secrets.MISTER_DISCORD_WEBHOOK }} ${{ steps.get_version.outputs.version }}
+        # .github/scripts/discord_notify.py ${{ secrets.FPGAMING_DISCORD_WEBHOOK }} ${{ steps.get_version.outputs.version }}
