@@ -6,6 +6,9 @@ sdcard/*
 !sdcard/firmware/
 sdcard/firmware/*
 !sdcard/firmware/LICENCE.broadcom_bcm43xx
+!sdcard/soundfonts/
+sdcard/soundfonts/*
+!sdcard/soundfonts/*.cfg
 !sdcard/*.cfg
 !sdcard/*.txt
 

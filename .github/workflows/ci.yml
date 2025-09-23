@@ -196,7 +196,7 @@ jobs:
       id: cache-generaluser-gs
       uses: actions/cache@v4
       with:
-        path: GeneralUser GS
+        path: GeneralUser-GS
         key: cache-generaluser-gs-${{ env.generaluser-gs-version }}
 
     - name: Download GeneralUser GS SoundFont if not retrieved from cache
@@ -239,9 +239,9 @@ jobs:
     - name: Add extra files to SD card directory
       run: |
         mkdir sdcard/docs
-        cp "GeneralUser GS/GeneralUser GS.sf2" sdcard/soundfonts
-        cp "GeneralUser GS/documentation/CHANGELOG.md" sdcard/docs/CHANGELOG.GeneralUserGS
-        cp "GeneralUser GS/documentation/LICENSE.txt" sdcard/docs/LICENSE.GeneralUserGS
+        cp "GeneralUser-GS/GeneralUser-GS.sf2" sdcard/soundfonts
+        cp "GeneralUser-GS/documentation/CHANGELOG.html" sdcard/docs/CHANGELOG.GeneralUserGS.html
+        cp "GeneralUser-GS/documentation/LICENSE.txt" sdcard/docs/LICENSE.GeneralUserGS.txt
         cp LICENSE sdcard/docs
         cp README.md sdcard/docs
 
