@@ -24,6 +24,7 @@
 #include <circle/timer.h>
 
 #include "config.h"
+#include <cstdint>
 #include "lcd/ui.h"
 #include "synth/mt32synth.h"
 #include "utility.h"

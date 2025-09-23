@@ -133,13 +133,10 @@ namespace Utility
 	}
 
 	// Swaps two objects in-place
-	template<class T>
-	inline void Swap(T& ObjectA, T& ObjectB)
-	{
-		u8 Buffer[sizeof(T)];
-		memcpy(Buffer, &ObjectA, sizeof(T));
-		memcpy(&ObjectA, &ObjectB, sizeof(T));
-		memcpy(&ObjectB, Buffer, sizeof(T));
+	template <class T>
+	inline void Swap(T& a, T& b) noexcept(noexcept(std::swap(a, b))) {
+	using std::swap;   // enable ADL
+	swap(a, b);
 	}
 
 	namespace
