@@ -206,11 +206,35 @@ jobs:
         gdown ${{ env.generaluser-gs-version }} -O "GeneralUser GS.zip"
         unzip "GeneralUser GS.zip"
 
-    - name: Retrieve built kernels
-      uses: actions/download-artifact@v4
+    - name: Find non-HDMI kernel artifacts
+      id: find-kernels
+      uses: actions/github-script@v7
       with:
-        name: kernels
+        script: |
+          const { data } = await github.rest.actions.listWorkflowRunArtifacts({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            run_id: context.runId,
+          });
+
+          // Keep only kernels-* that do NOT contain "hdmi"
+          const ids = data.artifacts
+            .filter(a => a.name.startsWith("kernels-") && !a.name.includes("hdmi"))
+            .map(a => a.id);
+
+          if (ids.length === 0) {
+            core.warning("No non-HDMI kernel artifacts found.");
+          }
+
+          core.setOutput("artifact_ids", ids.join(","));
+
+    - name: Download non-HDMI kernels
+      if: steps.find-kernels.outputs.artifact_ids != ''
+      uses: actions/download-artifact@v5
+      with:
+        artifact-ids: ${{ steps.find-kernels.outputs.artifact_ids }}
         path: sdcard
+        merge-multiple: true
 
     - name: Add extra files to SD card directory
       run: |
