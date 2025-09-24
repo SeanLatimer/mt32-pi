@@ -181,6 +181,7 @@ jobs:
         make -C ${{ env.wlan-home }}/firmware
         cp  ${{ env.wlan-home }}/firmware/brcmfmac43430-sdio.bin \
             ${{ env.wlan-home }}/firmware/brcmfmac43430-sdio.txt \
+            ${{ env.wlan-home }}/firmware/brcmfmac43430-sdio.clm_blob \
             ${{ env.wlan-home }}/firmware/brcmfmac43436-sdio.bin \
             ${{ env.wlan-home }}/firmware/brcmfmac43436-sdio.txt \
             ${{ env.wlan-home }}/firmware/brcmfmac43436-sdio.clm_blob \

@@ -137,9 +137,9 @@ cp -v \
 msg "Collecting WLAN firmware"
 make -C "$WLAN_HOME/firmware"
 cp -v \
-  "$WLAN_HOME/firmware/LICENCE.broadcom_bcm43xx" \
   "$WLAN_HOME/firmware/brcmfmac43430-sdio.bin" \
   "$WLAN_HOME/firmware/brcmfmac43430-sdio.txt" \
+  "$WLAN_HOME/firmware/brcmfmac43430-sdio.clm_blob" \
   "$WLAN_HOME/firmware/brcmfmac43436-sdio.bin" \
   "$WLAN_HOME/firmware/brcmfmac43436-sdio.txt" \
   "$WLAN_HOME/firmware/brcmfmac43436-sdio.clm_blob" \
